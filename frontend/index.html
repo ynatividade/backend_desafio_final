@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes e Produtos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Clientes</h1>
+
+    <form id="clienteForm">
+        <input type="hidden" id="clienteId">
+        <input type="text" id="nome" placeholder="Nome" required>
+        <input type="text" id="sobrenome" placeholder="Sobrenome" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="number" id="idade" placeholder="Idade" required>
+        <button type="submit">Salvar Cliente</button>
+    </form>
+
+    <h2>Lista de Clientes</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Sobrenome</th>
+                <th>Email</th>
+                <th>Idade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="clientesTable"></tbody>
+    </table>
+
+    <hr>
+
+    <h1>Produtos</h1>
+
+    <form id="produtoForm">
+        <input type="hidden" id="produtoId">
+        <input type="text" id="produtoNome" placeholder="Nome do Produto" required>
+        <input type="text" id="descricao" placeholder="Descrição" required>
+        <input type="number" id="preco" placeholder="Preço" step="0.01" required>
+        <button type="submit">Salvar Produto</button>
+    </form>
+
+    <h2>Lista de Produtos</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Preço</th>
+                <th>Atualizado em</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="produtosTable"></tbody>
+    </table>
+
+    <script src="script.js"></script>
+</body>
+</html>
