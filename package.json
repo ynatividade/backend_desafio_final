@@ -11,6 +11,7 @@
     "author": "Seu Nome",
     "license": "MIT",
     "dependencies": {
+        "chalk": "^5.4.1",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
         "debug": "^4.3.4",
@@ -19,7 +20,8 @@
         "http-errors": "^2.0.0",
         "jade": "^1.11.0",
         "morgan": "^1.10.0",
-        "mysql2": "^3.6.0"
+        "mysql2": "^3.6.0",
+        "node-cache": "^5.1.2"
     },
     "devDependencies": {
         "eslint": "^8.56.0",
