@@ -1,40 +1,49 @@
+// controllers/clienteController.js
+
 const clienteService = require('../services/clienteService');
-const cache = require('../configs/cache');
-const chalk = require('chalk').default;
 
+// Delega a busca de todos os clientes para o service.
+// O service vai decidir se usa o cache ou o banco de dados.
 exports.getAll = async (req, res) => {
-    const cacheKey = 'clientes';
-    const cachedData = cache.get(cacheKey);
-
-    if (cachedData) {
-        console.log(chalk.green('[CACHE] Clientes retornados do cache'));
-        return res.json(cachedData);
-    }
-
+  try {
     const clientes = await clienteService.getAll();
-    cache.set(cacheKey, clientes);
-    console.log(chalk.blue('[DB] Clientes retornados do banco de dados'));
     res.json(clientes);
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao buscar clientes' });
+  }
 };
 
+// Delega a criação para o service.
+// O service vai criar no banco e invalidar o cache.
 exports.create = async (req, res) => {
+  try {
     const cliente = req.body;
     const novo = await clienteService.create(cliente);
-    cache.del('clientes'); // invalida cache
     res.status(201).json(novo);
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao criar cliente' });
+  }
 };
 
+// Delega a atualização para o service.
 exports.update = async (req, res) => {
+  try {
     const id = req.params.id;
     const dados = req.body;
     const atualizado = await clienteService.update(id, dados);
-    cache.del('clientes'); // invalida cache
     res.json(atualizado);
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao atualizar cliente' });
+  }
 };
 
+// Delega a remoção para o service.
 exports.remove = async (req, res) => {
+  try {
     const id = req.params.id;
     await clienteService.remove(id);
-    cache.del('clientes'); // invalida cache
     res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao remover cliente' });
+  }
 };

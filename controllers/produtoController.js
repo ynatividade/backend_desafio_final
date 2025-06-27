@@ -1,6 +1,6 @@
 const produtoService = require('../services/produtoService');
 const cache = require('../configs/cache');
-const chalk = require('chalk').default;
+const chalk = require('chalk');
 
 exports.getAll = async (req, res) => {
     const cacheKey = 'produtos';

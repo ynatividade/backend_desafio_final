@@ -7,6 +7,9 @@ require('dotenv').config();
 
 const clientesRoutes = require('./routes/clientes');
 const produtosRoutes = require('./routes/produtos');
+const usuariosRoutes = require('./routes/usuarios');
+const loginRoutes = require('./routes/login');
+const logoutRoutes = require('./routes/logout');
 
 const app = express();
 app.use(cors());
@@ -20,6 +23,9 @@ app.use(cookieParser());
 // Rotas
 app.use('/clientes', clientesRoutes);
 app.use('/produtos', produtosRoutes);
+app.use('/usuarios', usuariosRoutes);
+app.use('/login', loginRoutes);
+app.use('/logout', logoutRoutes);
 
 // Rota principal
 app.get('/', (req, res) => {
@@ -38,7 +44,9 @@ app.use((err, req, res, next) => {
 });
 
 // Inicia servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
+// const PORT = process.env.PORT || 3000;
+//app.listen(PORT, () => {
+//    console.log(`Servidor rodando em http://localhost:${PORT}`);
+//});
+
+module.exports = app;
