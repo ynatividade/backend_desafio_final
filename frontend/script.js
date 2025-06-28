@@ -1,155 +1,218 @@
-// CLIENTES
-const clienteApi = 'http://localhost:3000/clientes';
-const clienteForm = document.getElementById('clienteForm');
-const clienteId = document.getElementById('clienteId');
-const clientesTable = document.getElementById('clientesTable');
+document.addEventListener('DOMContentLoaded', () => {
 
-function carregarClientes() {
-    fetch(clienteApi)
-        .then(res => res.json())
-        .then(clientes => {
-            clientesTable.innerHTML = '';
-            clientes.forEach(c => {
-                const row = document.createElement('tr');
+    const API_BASE_URL = 'http://localhost:3000';
 
-                const editarBtn = document.createElement('button');
-                editarBtn.textContent = 'Editar';
-                editarBtn.onclick = () => editarCliente(c.id, c.nome, c.sobrenome, c.email, c.idade);
+    // Seletores de UI
+    const publicView = document.getElementById('public-view');
+    const appView = document.getElementById('app-view');
+    const authControls = document.getElementById('auth-controls');
+    const mainNav = document.getElementById('main-nav');
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const welcomeMessage = document.getElementById('welcome-message');
+    const logoutButton = document.getElementById('logout-button');
+    const navButtons = document.querySelectorAll('.nav-button');
+    const contentSections = document.querySelectorAll('.content-section');
+    
+    // Tabelas
+    const produtosTablePublic = document.getElementById('produtosTablePublic');
+    const produtosTablePrivate = document.getElementById('produtosTablePrivate');
+    const clientesTableBody = document.getElementById('clientesTable');
+    const usuariosList = document.getElementById('usuarios-list');
+    
+    // Formulários
+    const clienteForm = document.getElementById('clienteForm');
+    const produtoForm = document.getElementById('produtoForm');
 
-                const deletarBtn = document.createElement('button');
-                deletarBtn.textContent = 'Excluir';
-                deletarBtn.onclick = () => deletarCliente(c.id);
-
-                const actionsCell = document.createElement('td');
-                actionsCell.appendChild(editarBtn);
-                actionsCell.appendChild(deletarBtn);
-
-                row.innerHTML = `
-                    <td>${c.nome}</td>
-                    <td>${c.sobrenome}</td>
-                    <td>${c.email}</td>
-                    <td>${c.idade}</td>
-                `;
-                row.appendChild(actionsCell);
-                clientesTable.appendChild(row);
-            });
-        });
-}
-
-function editarCliente(id, nome, sobrenome, email, idade) {
-    clienteId.value = id;
-    clienteForm.nome.value = nome;
-    clienteForm.sobrenome.value = sobrenome;
-    clienteForm.email.value = email;
-    clienteForm.idade.value = idade;
-}
-
-function deletarCliente(id) {
-    if (confirm('Deseja realmente excluir este cliente?')) {
-        fetch(`${clienteApi}/${id}`, { method: 'DELETE' })
-            .then(() => carregarClientes());
-    }
-}
-
-clienteForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const cliente = {
-        nome: clienteForm.nome.value,
-        sobrenome: clienteForm.sobrenome.value,
-        email: clienteForm.email.value,
-        idade: parseInt(clienteForm.idade.value)
+    const updateUI = (isLoggedIn) => {
+        publicView.classList.toggle('hidden', isLoggedIn);
+        appView.classList.toggle('hidden', !isLoggedIn);
+        mainNav.classList.toggle('hidden', !isLoggedIn);
+        if (isLoggedIn) {
+            authControls.classList.remove('hidden');
+            welcomeMessage.textContent = `Bem-vindo(a), ${localStorage.getItem('username')}!`;
+        } else {
+            authControls.classList.add('hidden');
+        }
+    };
+    
+    // Função para alternar entre as seções logadas (Produtos, Clientes, Usuários)
+    const switchSection = (targetId) => {
+        contentSections.forEach(section => section.classList.toggle('hidden', section.id !== targetId));
+        navButtons.forEach(button => button.classList.toggle('active', button.dataset.target === targetId));
     };
 
-    const id = clienteId.value;
-    const method = id ? 'PUT' : 'POST';
-    const url = id ? `${clienteApi}/${id}` : clienteApi;
-
-    fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cliente)
-    }).then(() => {
-        clienteForm.reset();
-        clienteId.value = '';
-        carregarClientes();
-    });
-});
-
-// PRODUTOS
-const produtoApi = 'http://localhost:3000/produtos';
-const produtoForm = document.getElementById('produtoForm');
-const produtoId = document.getElementById('produtoId');
-const produtosTable = document.getElementById('produtosTable');
-
-function carregarProdutos() {
-    fetch(produtoApi)
-        .then(res => res.json())
-        .then(produtos => {
-            produtosTable.innerHTML = '';
-            produtos.forEach(p => {
-                const row = document.createElement('tr');
-
-                const editarBtn = document.createElement('button');
-                editarBtn.textContent = 'Editar';
-                editarBtn.onclick = () => editarProduto(p.id, p.nome, p.descricao, p.preco);
-
-                const deletarBtn = document.createElement('button');
-                deletarBtn.textContent = 'Excluir';
-                deletarBtn.onclick = () => deletarProduto(p.id);
-
-                const actionsCell = document.createElement('td');
-                actionsCell.appendChild(editarBtn);
-                actionsCell.appendChild(deletarBtn);
-
-                row.innerHTML = `
-                    <td>${p.nome}</td>
-                    <td>${p.descricao}</td>
-                    <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
-                    <td>${new Date(p.data_atualizado).toLocaleString()}</td>
-                `;
-                row.appendChild(actionsCell);
-                produtosTable.appendChild(row);
+    /** FUNÇÕES DE AUTENTICAÇÃO **/
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        const usuario = document.getElementById('usuario').value;
+        const senha = document.getElementById('senha').value;
+        loginError.textContent = '';
+        try {
+            const response = await fetch(`${API_BASE_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuario, senha }),
             });
-        });
-}
-
-function editarProduto(id, nome, descricao, preco) {
-    produtoId.value = id;
-    produtoForm.produtoNome.value = nome;
-    produtoForm.descricao.value = descricao;
-    produtoForm.preco.value = preco;
-}
-
-function deletarProduto(id) {
-    if (confirm('Deseja realmente excluir este produto?')) {
-        fetch(`${produtoApi}/${id}`, { method: 'DELETE' })
-            .then(() => carregarProdutos());
-    }
-}
-
-produtoForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const produto = {
-        nome: produtoForm.produtoNome.value,
-        descricao: produtoForm.descricao.value,
-        preco: parseFloat(produtoForm.preco.value)
+            if (!response.ok) throw new Error('Usuário ou senha inválidos.');
+            const data = await response.json();
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('username', usuario);
+            initApp();
+        } catch (error) {
+            loginError.textContent = error.message;
+        }
     };
 
-    const id = produtoId.value;
-    const method = id ? 'PUT' : 'POST';
-    const url = id ? `${produtoApi}/${id}` : produtoApi;
+    const handleLogout = async () => {
+        try {
+            await authFetch(`${API_BASE_URL}/logout`, { method: 'POST' });
+        } catch (error) {
+            console.error('Erro no logout do servidor, mas deslogando localmente.', error);
+        } finally {
+            localStorage.clear();
+            initApp();
+        }
+    };
 
-    fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(produto)
-    }).then(() => {
-        produtoForm.reset();
-        produtoId.value = '';
-        carregarProdutos();
-    });
+    /** LÓGICA DE DADOS (API CALLS) **/
+    const authFetch = async (url, options = {}) => {
+        const token = localStorage.getItem('authToken');
+        if (!token) { handleLogout(); throw new Error('Não autenticado'); }
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...options.headers };
+        const response = await fetch(url, { ...options, headers });
+        if (response.status === 401) { handleLogout(); throw new Error('Sessão expirada'); }
+        if (!response.ok && response.status !== 204) throw new Error('Falha na requisição');
+        return response.status === 204 ? null : response.json();
+    };
+
+    const loadPublicProducts = async () => {
+        try {
+            const produtos = await fetch(`${API_BASE_URL}/produtos`).then(res => res.json());
+            renderProdutos(produtos, false, produtosTablePublic);
+        } catch (error) {
+            console.error('Erro ao carregar produtos públicos:', error);
+        }
+    };
+    
+    const loadPrivateData = async () => {
+        try {
+            const [produtos, clientes, usuarios] = await Promise.all([
+                authFetch(`${API_BASE_URL}/produtos`),
+                authFetch(`${API_BASE_URL}/clientes`),
+                authFetch(`${API_BASE_URL}/usuarios`)
+            ]);
+            renderProdutos(produtos, true, produtosTablePrivate);
+            renderClientes(clientes);
+            renderUsuarios(usuarios);
+        } catch (error) {
+            console.error('Erro ao carregar dados privados:', error);
+        }
+    };
+    
+    /** RENDERIZAÇÃO E MANIPULAÇÃO DO DOM **/
+    const renderProdutos = (produtos, isLoggedIn, tableBody) => {
+        tableBody.innerHTML = '';
+        if (!produtos || produtos.length === 0) return;
+
+        produtos.forEach(p => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `<td>${p.nome}</td><td>${p.descricao}</td><td>R$ ${parseFloat(p.preco).toFixed(2)}</td><td>${p.data_atualizado ? new Date(p.data_atualizado).toLocaleString('pt-BR') : 'N/A'}</td>`;
+            if (isLoggedIn) {
+                const actionsCell = row.insertCell();
+                actionsCell.append(createButton('Editar', 'edit-btn', () => populateProdutoForm(p)));
+                actionsCell.append(createButton('Excluir', 'delete-btn', () => handleDelete('produtos', p.id, loadPrivateData)));
+            }
+        });
+    };
+
+    const renderClientes = (clientes) => {
+        clientesTableBody.innerHTML = '';
+        if (!clientes || clientes.length === 0) return;
+        clientes.forEach(c => {
+            const row = clientesTableBody.insertRow();
+            row.innerHTML = `<td>${c.nome}</td><td>${c.sobrenome}</td><td>${c.email}</td><td>${c.idade}</td><td></td>`;
+            const actionsCell = row.cells[4];
+            actionsCell.append(createButton('Editar', 'edit-btn', () => populateClienteForm(c)));
+            actionsCell.append(createButton('Excluir', 'delete-btn', () => handleDelete('clientes', c.id, loadPrivateData)));
+        });
+    };
+    
+    const renderUsuarios = (usuarios) => {
+        usuariosList.innerHTML = '';
+        if (!usuarios || usuarios.length === 0) return;
+        usuariosList.innerHTML = `<ul class="list-disc pl-5 space-y-2">${usuarios.map(u => `<li>${u.usuario} <span class="text-gray-500">(ID: ${u.id})</span></li>`).join('')}</ul>`;
+    };
+
+    const handleFormSubmit = async (e, resource) => {
+        e.preventDefault();
+        let id, body, form;
+        if (resource === 'produtos') {
+            form = produtoForm;
+            id = document.getElementById('produtoId').value;
+            body = { nome: form.produtoNome.value, descricao: form.descricao.value, preco: parseFloat(form.preco.value) };
+        } else {
+            form = clienteForm;
+            id = document.getElementById('clienteId').value;
+            body = { nome: form.nome.value, sobrenome: form.sobrenome.value, email: form.email.value, idade: parseInt(form.idade.value) };
+        }
+        await authFetch(id ? `${API_BASE_URL}/${resource}/${id}` : `${API_BASE_URL}/${resource}`, { method: id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+        form.reset(); 
+        if(resource === 'produtos') document.getElementById('produtoId').value = '';
+        else document.getElementById('clienteId').value = '';
+        loadPrivateData();
+    };
+
+    const populateProdutoForm = (p) => {
+        produtoForm.produtoId.value = p.id;
+        produtoForm.produtoNome.value = p.nome;
+        produtoForm.descricao.value = p.descricao;
+        produtoForm.preco.value = p.preco;
+        produtoForm.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const populateClienteForm = (c) => {
+        clienteForm.clienteId.value = c.id;
+        clienteForm.nome.value = c.nome;
+        clienteForm.sobrenome.value = c.sobrenome;
+        clienteForm.email.value = c.email;
+        clienteForm.idade.value = c.idade;
+        clienteForm.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const createButton = (text, className, onClick) => {
+        const button = document.createElement('button');
+        button.textContent = text;
+        button.className = className;
+        button.onclick = onClick;
+        return button;
+    };
+
+    const handleDelete = async (resource, id, callback) => {
+        if (!confirm(`Deseja realmente excluir este item?`)) return;
+        await authFetch(`${API_BASE_URL}/${resource}/${id}`, { method: 'DELETE' });
+        callback();
+    };
+    
+    /** INICIALIZAÇÃO DA APLICAÇÃO **/
+    const initApp = () => {
+        const isLoggedIn = !!localStorage.getItem('authToken');
+        updateUI(isLoggedIn);
+
+        if (isLoggedIn) {
+            loadPrivateData();
+            switchSection('produtos-section');
+        } else {
+            loadPublicProducts();
+        }
+    };
+    
+    // Listeners de eventos
+    loginForm.addEventListener('submit', handleLogin);
+    logoutButton.addEventListener('click', handleLogout);
+    navButtons.forEach(button => button.addEventListener('click', () => switchSection(button.dataset.target)));
+    clienteForm.addEventListener('submit', (e) => handleFormSubmit(e, 'clientes'));
+    produtoForm.addEventListener('submit', (e) => handleFormSubmit(e, 'produtos'));
+
+    initApp();
 });
-
-// INICIALIZAÇÃO
-carregarClientes();
-carregarProdutos();

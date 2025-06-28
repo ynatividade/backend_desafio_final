@@ -1,48 +1,99 @@
-body {
-    font-family: Arial, sans-serif;
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 20px;
-    background-color: #f6f6f6;
-}
-
-h1, h2 {
-    text-align: center;
-}
-
-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-form input {
-    flex: 1 1 180px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-form button {
-    padding: 8px 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-form button:hover {
-    background-color: #0056b3;
-}
-
+/* Estilos para a tabela para manter um visual limpo */
 table {
     width: 100%;
     border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e2e8f0; /* Linha apenas na parte inferior */
+    text-align: left;
+}
+
+thead {
+    background-color: #f8fafc;
+}
+
+tbody tr:hover {
+    background-color: #f1f5f9; /* Efeito hover sutil */
+}
+
+/* Estilo para os botões de ação na tabela */
+td button {
+    padding: 6px 12px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: white;
+    font-weight: 500;
+    transition: transform 0.1s;
+}
+td button:hover {
+    transform: scale(1.05);
+}
+
+.edit-btn { background-color: #f97316; }
+.edit-btn:hover { background-color: #ea580c; }
+.delete-btn { background-color: #dc2626; }
+.delete-btn:hover { background-color: #b91c1c; }
+
+/* Estilo para os cards de formulário */
+.form-card {
     background: white;
-    border-radius
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    display: grid;
+    gap: 1rem;
+}
+
+.form-title {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 600; /* font-semibold */
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-card input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.375rem;
+}
+
+.form-card button {
+    padding: 0.75rem 1rem;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.form-card button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Estilo para os botões de navegação */
+.nav-button {
+    background-color: #ffffff;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    transition: all 0.2s;
+}
+
+.nav-button:hover {
+    background-color: #f1f5f9;
+}
+
+.nav-button.active {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+}
